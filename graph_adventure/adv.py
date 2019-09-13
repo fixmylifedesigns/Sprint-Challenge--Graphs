@@ -21,7 +21,37 @@ player = Player("Name", world.startingRoom)
 
 
 # FILL THIS IN
-traversalPath = ['n', 's']
+traversalPath = []
+exist_path = [None]
+connectedDirections = {'n':'s', 's':'n','e':'w', 'w': 'e'}
+# gets the length of the minus one so when all the rooms
+graph_len = len(roomGraph) - 1
+# room_len = len(rooms_in_route)
+
+#if the length of our rooms in route is smaller than the length of the rooms avalible it will run this loop until its equal once it equals the same length it will end the loop since it will be greater than the graph - 1
+rooms_in_route = {}
+# set the player in the first room 
+rooms_in_route[player.currentRoom.id] = player.currentRoom.getExits()
+# while room_len != graph_len:
+while len(rooms_in_route) < graph_len:
+
+    if player.currentRoom.id not in rooms_in_route:
+        
+        rooms_in_route[player.currentRoom.id] = player.currentRoom.getExits()
+        previous = exist_path[-1]
+        rooms_in_route[player.currentRoom.id].remove(exist_path[-1])
+    
+    while len(rooms_in_route[player.currentRoom.id]) is 0:
+        # take it out, add it to traversalpath then travel
+        back = exist_path.pop()
+        traversalPath.append(back)
+        player.travel(back)
+
+    direction = rooms_in_route[player.currentRoom.id].pop(0)
+    traversalPath.append(direction)
+    
+    exist_path.append(connectedDirections[direction])
+    player.travel(direction)
 
 
 # TRAVERSAL TEST
@@ -34,6 +64,7 @@ for move in traversalPath:
 
 if len(visited_rooms) == len(roomGraph):
     print(f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
+    print(len(roomGraph))
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
